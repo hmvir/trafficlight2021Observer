@@ -17,14 +17,24 @@ public class TrafficLightCtrl {
 
     private final TrafficLightGui gui;
 
+    private static TrafficLightCtrl instance = null;
+
     private boolean doRun = true;
 
-    public TrafficLightCtrl() {
+    public static TrafficLightCtrl getInstance(){
+        if(null == TrafficLightCtrl.instance){
+            TrafficLightCtrl.instance = new TrafficLightCtrl();
+        }
+        return TrafficLightCtrl.instance;
+    }
+
+    private TrafficLightCtrl() {
         super();
         initStates();
         gui = new TrafficLightGui(this);
         gui.setVisible(true);
         //TODO useful to update the current state
+        currentState.notifyObserver(currentState);
     }
 
     private void initStates() {
@@ -32,6 +42,8 @@ public class TrafficLightCtrl {
             @Override
             public State getNextState() {
                 previousState = currentState;
+                yellowState.notifyObserver(yellowState);
+                notifyObserver(this);
                 //TODO useful to update the current state and the old one
                 return yellowState;
             }
@@ -45,6 +57,8 @@ public class TrafficLightCtrl {
             @Override
             public State getNextState() {
                 previousState = currentState;
+                yellowState.notifyObserver(yellowState);
+                notifyObserver(this);
                 //TODO useful to update the current state and the old one
                 return yellowState;
             }
@@ -59,10 +73,14 @@ public class TrafficLightCtrl {
             public State getNextState() {
                 if (previousState.equals(greenState)) {
                     previousState = currentState;
+                    redState.notifyObserver(redState);
+                    notifyObserver(this);
                     //TODO useful to update the current state and the old one
                     return redState;
                 }else {
                     previousState = currentState;
+                    greenState.notifyObserver(greenState);
+                    notifyObserver(this);
                     //TODO useful to update the current state and the old one
                     return greenState;
                 }
